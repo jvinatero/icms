@@ -1,0 +1,197 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+
+<div class="card shadow">
+
+<div class="card-header">
+
+<div class="d-flex justify-content-between">
+
+<h4>Groups</h4>
+{% with messages=get_flashed_messages(with_categories=true) %}
+{% if messages %}
+
+{% for category,message in messages %}
+
+<div class="alert alert-{{category}} alert-dismissible fade show">
+    {{message}}
+    <button class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+{% endfor %}
+
+{% endif %}
+{% endwith %}
+
+<button
+class="btn btn-primary"
+data-bs-toggle="modal"
+data-bs-target="#groupModal">
+
+<i class="bi bi-plus-circle"></i>
+
+New Group
+
+</button>
+
+</div>
+
+</div>
+
+<div class="card-body">
+
+<table class="table table-hover align-middle">
+
+<thead>
+
+<tr>
+
+<a class="btn btn-warning btn-sm">
+    <i class="bi bi-pencil"></i>
+</a>
+
+<a class="btn btn-danger btn-sm">
+    <i class="bi bi-trash"></i>
+</a>
+
+<th width="80">
+
+ID
+
+</th>
+
+<th>
+
+Group Name
+
+</th>
+
+<th width="120">
+
+Status
+
+</th>
+
+<th width="150">
+
+Action
+
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for g in groups %}
+
+<tr>
+
+<td>{{g.id}}</td>
+
+<td>{{g.group_name}}</td>
+
+<td>
+
+{% if g.active %}
+
+<span class="badge bg-success">
+
+Active
+
+</span>
+
+{% else %}
+
+<span class="badge bg-danger">
+
+Inactive
+
+</span>
+
+{% endif %}
+
+</td>
+
+<td>
+
+<button class="btn btn-warning btn-sm">
+
+Edit
+
+</button>
+
+<button class="btn btn-danger btn-sm">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="modal fade" id="groupModal">
+
+<div class="modal-dialog">
+
+<form action="/groups/add" method="post">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h5>Add Group</h5>
+
+</div>
+
+<div class="modal-body">
+
+<input
+type="text"
+class="form-control"
+name="group_name"
+placeholder="Group Name"
+required>
+
+</div>
+
+<div class="modal-footer">
+
+<button
+class="btn btn-secondary"
+data-bs-dismiss="modal">
+
+Cancel
+
+</button>
+
+<button
+class="btn btn-primary">
+
+Save
+
+</button>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+{% endblock %}
