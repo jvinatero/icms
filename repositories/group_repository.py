@@ -6,11 +6,17 @@ class GroupRepository:
 
     @staticmethod
     def get_all():
-        return Group.query.order_by(Group.id).all()
+        return Group.query.order_by(Group.group_name).all()
 
     @staticmethod
-    def get_by_id(group_id):
-        return Group.query.get(group_id)
+    def search(keyword):
+        return Group.query.filter(
+            Group.group_name.contains(keyword)
+        ).order_by(Group.group_name).all()
+
+    @staticmethod
+    def get(group_id):
+        return db.session.get(Group, group_id)
 
     @staticmethod
     def get_by_name(name):

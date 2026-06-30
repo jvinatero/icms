@@ -1,37 +1,74 @@
 <div class="sidebar bg-dark text-white p-3">
 
     <h4 class="mb-4">
-        ICMS
+        <a href="{{ url_for('dashboard.index') }}"
+           class="text-white text-decoration-none">
+            ICMS
+        </a>
     </h4>
 
-    <a href="/" class="menu-item">
+    <a href="{{ url_for('dashboard.index') }}" class="menu-item">
         <i class="bi bi-speedometer2"></i>
         Dashboard
     </a>
 
-    <a href="/groups/" class="menu-item">
+    <hr class="text-secondary">
+
+    <div class="menu-title">
+        MASTER DATA
+    </div>
+
+    <a href="{{ url_for('groups.index') }}" class="menu-item">
         <i class="bi bi-people-fill"></i>
-        Groups
+        Cleaning Groups
     </a>
 
     <a href="#" class="menu-item">
         <i class="bi bi-pin-map-fill"></i>
         Cleaning Areas
+        <span class="badge bg-secondary float-end">Soon</span>
+    </a>
+
+    <hr class="text-secondary">
+
+    <div class="menu-title">
+        OPERATIONS
+    </div>
+
+    <a href="#" class="menu-item">
+        <i class="bi bi-diagram-3-fill"></i>
+        Assignments
+        <span class="badge bg-secondary float-end">Soon</span>
     </a>
 
     <a href="#" class="menu-item">
-        <i class="bi bi-calendar3"></i>
-        Schedules
+        <i class="bi bi-calendar-event-fill"></i>
+        Schedule Generator
+        <span class="badge bg-secondary float-end">Soon</span>
     </a>
 
+    <hr class="text-secondary">
+
+    <div class="menu-title">
+        REPORTS
+    </div>
+
     <a href="#" class="menu-item">
-        <i class="bi bi-printer-fill"></i>
+        <i class="bi bi-file-earmark-bar-graph-fill"></i>
         Reports
+        <span class="badge bg-secondary float-end">Soon</span>
     </a>
+
+    <hr class="text-secondary">
+
+    <div class="menu-title">
+        ADMINISTRATION
+    </div>
 
     <a href="#" class="menu-item">
         <i class="bi bi-gear-fill"></i>
         Settings
+        <span class="badge bg-secondary float-end">Soon</span>
     </a>
 
 </div>
