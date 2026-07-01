@@ -1,0 +1,284 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+
+    <div class="card-header d-flex justify-content-between align-items-center">
+
+        <h4 class="mb-0">
+            Assignment Board
+        </h4>
+
+        <button
+            id="btnSaveAssignments"
+            class="btn btn-success">
+
+            <i class="bi bi-save"></i>
+
+            Save Assignments
+
+        </button>
+
+    </div>
+
+    <div class="card-body">
+
+        {% include "includes/flash_messages.html" %}
+
+        <table class="table table-bordered table-hover align-middle">
+
+            <thead class="table-primary">
+
+                <tr>
+
+                    <th width="45"></th>
+
+                    <th width="70">
+                        Order
+                    </th>
+
+                    <th>
+                        Cleaning Group
+                    </th>
+
+                    <th>
+                        Cleaning Area
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="assignmentTable">
+
+            {% for i in range(groups|length) %}
+
+                <tr>
+
+                    <td class="text-center">
+
+                        <i
+                            class="bi bi-list drag-handle"
+                            style="cursor:grab;font-size:22px;">
+                        </i>
+
+                    </td>
+
+                    <td class="order-cell">
+
+                        {{ i+1 }}
+
+                    </td>
+
+                    <td>
+
+                        <select class="form-select group-select">
+
+                            <option value="">
+                                -- Select Group --
+                            </option>
+
+                            {% for group in groups %}
+
+                            <option
+                                value="{{ group.id }}"
+                                {% if assignment_map.get(i+1) and assignment_map[i+1].group_id==group.id %}
+                                selected
+                                {% endif %}>
+
+                                {{ group.group_name }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </td>
+
+                    <td>
+
+                        <select class="form-select area-select">
+
+                            <option value="">
+                                -- Select Area --
+                            </option>
+
+                            {% for area in areas %}
+
+                            <option
+                                value="{{ area.id }}"
+                                {% if assignment_map.get(i+1) and assignment_map[i+1].area_id==area.id %}
+                                selected
+                                {% endif %}>
+
+                                {{ area.area_name }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+
+<script>
+
+const tbody = document.getElementById("assignmentTable");
+
+new Sortable(tbody,{
+
+    animation:150,
+
+    handle:".drag-handle",
+
+    onEnd:updateOrder
+
+});
+
+function updateOrder(){
+
+    document.querySelectorAll("#assignmentTable tr").forEach((row,index)=>{
+
+        row.querySelector(".order-cell").innerText=index+1;
+
+    });
+
+}
+
+function validateSelections(){
+
+    let groups=new Set();
+    let areas=new Set();
+
+    let valid=true;
+
+    document.querySelectorAll(".group-select").forEach(s=>{
+
+        s.classList.remove("is-invalid");
+
+        if(!s.value) return;
+
+        if(groups.has(s.value)){
+
+            s.classList.add("is-invalid");
+
+            valid=false;
+
+        }
+
+        groups.add(s.value);
+
+    });
+
+    document.querySelectorAll(".area-select").forEach(s=>{
+
+        s.classList.remove("is-invalid");
+
+        if(!s.value) return;
+
+        if(areas.has(s.value)){
+
+            s.classList.add("is-invalid");
+
+            valid=false;
+
+        }
+
+        areas.add(s.value);
+
+    });
+
+    return valid;
+
+}
+
+document.querySelectorAll("select").forEach(s=>{
+
+    s.addEventListener("change",validateSelections);
+
+});
+
+document.getElementById("btnSaveAssignments").onclick=function(){
+
+    if(!validateSelections()){
+
+        alert("Duplicate Cleaning Group or Cleaning Area detected.");
+
+        return;
+
+    }
+
+    let assignments=[];
+
+    document.querySelectorAll("#assignmentTable tr").forEach((row,index)=>{
+
+        const group=row.querySelector(".group-select").value;
+        const area=row.querySelector(".area-select").value;
+
+        if(group && area){
+
+            assignments.push({
+
+                display_order:index+1,
+
+                group_id:group,
+
+                area_id:area
+
+            });
+
+        }
+
+    });
+
+    fetch("{{ url_for('assignments.save') }}",{
+
+        method:"POST",
+
+        headers:{
+
+            "Content-Type":"application/json"
+
+        },
+
+        body:JSON.stringify(assignments)
+
+    })
+
+    .then(r=>r.json())
+
+    .then(r=>{
+
+        alert(r.message);
+
+        if(r.success){
+
+            location.reload();
+
+        }
+
+    });
+
+}
+
+validateSelections();
+
+</script>
+
+{% endblock %}

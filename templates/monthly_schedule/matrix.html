@@ -1,0 +1,438 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<style>
+
+@page{
+    size:A4 landscape;
+    margin:12mm;
+}
+
+@media print{
+
+    .no-print,
+    .sidebar,
+    nav,
+    footer{
+
+        display:none !important;
+
+    }
+
+    body{
+
+        background:white !important;
+
+    }
+
+    .schedule-paper{
+
+        box-shadow:none;
+
+        padding:0;
+
+    }
+
+}
+
+.schedule-paper{
+
+    background:white;
+
+    padding:30px;
+
+    box-shadow:0 0 10px rgba(0,0,0,.15);
+
+}
+
+.schedule-title{
+
+    text-align:center;
+
+    margin-bottom:25px;
+
+}
+
+.schedule-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.schedule-table th,
+.schedule-table td{
+
+    border:1px solid #666;
+
+    padding:8px;
+
+    text-align:center;
+
+    vertical-align:top;
+
+}
+
+.schedule-table th{
+
+    background:#0d6efd;
+
+    color:white;
+
+}
+
+.group-col{
+
+    width:180px;
+
+}
+
+.area-name{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:8px;
+
+    margin-bottom:10px;
+
+    font-weight:bold;
+
+    font-size:14px;
+
+}
+
+.area-color{
+
+    width:18px;
+
+    height:18px;
+
+    border-radius:4px;
+
+    border:1px solid #444;
+
+    display:inline-block;
+
+}
+
+.chk{
+
+    cursor:pointer;
+
+    font-size:22px;
+
+    user-select:none;
+
+}
+
+.chk:hover{
+
+    color:#198754;
+
+}
+
+.label{
+
+    font-size:11px;
+
+    color:#777;
+
+}
+
+.legend{
+
+    margin-top:30px;
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:18px;
+
+    justify-content:center;
+
+}
+
+.legend-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    font-size:13px;
+
+}
+
+</style>
+
+<div class="no-print mb-3">
+
+    <a
+        href="{{ url_for('monthly_schedule.index') }}"
+        class="btn btn-secondary">
+
+        <i class="bi bi-arrow-left"></i>
+
+        Back
+
+    </a>
+
+    <button
+        class="btn btn-success"
+        onclick="window.print()">
+
+        <i class="bi bi-printer"></i>
+
+        Print
+
+    </button>
+
+</div>
+
+<div class="schedule-paper">
+
+{% set months=[
+"",
+"JANUARY",
+"FEBRUARY",
+"MARCH",
+"APRIL",
+"MAY",
+"JUNE",
+"JULY",
+"AUGUST",
+"SEPTEMBER",
+"OCTOBER",
+"NOVEMBER",
+"DECEMBER"
+] %}
+
+<div class="schedule-title">
+
+<h2>
+
+INDAHAG CONGREGATION
+
+</h2>
+
+<h4>
+
+MONTHLY CLEANING SCHEDULE
+
+</h4>
+
+<h3>
+
+{{ months[schedule.month] }} {{ schedule.year }}
+
+</h3>
+
+</div>
+
+<table class="schedule-table">
+
+<thead>
+
+<tr>
+
+<th class="group-col">
+
+Cleaning Group
+
+</th>
+
+{% for week_no,header in week_headers.items() %}
+
+<th>
+
+Week {{ week_no }}
+
+<hr class="m-1">
+
+Fri {{ header.friday.strftime("%b %d") }}
+
+<br>
+
+Sun {{ header.sunday.strftime("%b %d") }}
+
+</th>
+
+{% endfor %}
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for item in matrix.values() %}
+
+<tr>
+
+<td>
+
+<strong>
+
+{{ item.group.group_name }}
+
+</strong>
+
+</td>
+
+{% for week_no in week_headers.keys() %}
+
+{% set detail=item.weeks.get(week_no) %}
+
+<td>
+
+{% if detail %}
+
+<div class="area-name">
+
+<span
+class="area-color"
+style="background:{{ detail.area.map_color }};">
+</span>
+
+{{ detail.area.area_name }}
+
+</div>
+
+<div>
+
+<span
+class="chk"
+data-id="{{ detail.id }}"
+data-type="Friday">
+
+{{ "☑" if detail.friday_done else "☐" }}
+
+</span>
+
+<div class="label">
+
+Friday
+
+</div>
+
+</div>
+
+<br>
+
+<div>
+
+<span
+class="chk"
+data-id="{{ detail.id }}"
+data-type="Sunday">
+
+{{ "☑" if detail.sunday_done else "☐" }}
+
+</span>
+
+<div class="label">
+
+Sunday
+
+</div>
+
+</div>
+
+{% endif %}
+
+</td>
+
+{% endfor %}
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+<div class="legend">
+
+{% set shown=[] %}
+
+{% for item in matrix.values() %}
+
+{% for detail in item.weeks.values() %}
+
+{% if detail.area.id not in shown %}
+
+{% set _=shown.append(detail.area.id) %}
+
+<div class="legend-item">
+
+<span
+class="area-color"
+style="background:{{ detail.area.map_color }};">
+</span>
+
+{{ detail.area.area_name }}
+
+</div>
+
+{% endif %}
+
+{% endfor %}
+
+{% endfor %}
+
+</div>
+
+</div>
+
+<script>
+
+document.querySelectorAll(".chk").forEach(box=>{
+
+box.onclick=async function(){
+
+const r=await fetch(
+
+"{{ url_for('monthly_schedule.toggle') }}",
+
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+detail_id:this.dataset.id,
+
+meeting_type:this.dataset.type
+
+})
+
+}
+
+);
+
+const j=await r.json();
+
+this.textContent=j.completed ? "☑" : "☐";
+
+};
+
+});
+
+</script>
+
+{% endblock %}

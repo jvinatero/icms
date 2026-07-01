@@ -1,31 +1,39 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", function () {
 
-    // ===========================
-    // SweetAlert Delete Confirm
-    // ===========================
+    // ==========================
+    // DELETE CONFIRMATION
+    // ==========================
 
-    document.querySelectorAll(".btn-delete").forEach(button => {
+    document.querySelectorAll(".btn-delete").forEach(btn => {
 
-        button.addEventListener("click", function (e) {
+        btn.addEventListener("click", function (e) {
 
             e.preventDefault();
 
-            const url = this.getAttribute("href");
+            const url = this.href;
 
             Swal.fire({
-                title: "Delete Group?",
+
+                title: "Delete Area?",
+
                 text: "This action cannot be undone.",
+
                 icon: "warning",
+
                 showCancelButton: true,
-                confirmButtonColor: "#dc3545",
-                cancelButtonColor: "#6c757d",
+
+                confirmButtonColor: "#d33",
+
                 confirmButtonText: "Delete",
-                cancelButtonText: "Cancel",
-                reverseButtons: true
+
+                cancelButtonText: "Cancel"
+
             }).then((result) => {
 
                 if (result.isConfirmed) {
-                    window.location.href = url;
+
+                    window.location = url;
+
                 }
 
             });
@@ -35,42 +43,79 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // ===========================
-    // Auto Focus on Modal
-    // ===========================
+    // ==========================
+    // NEW AREA
+    // ==========================
 
-    const groupModal = document.getElementById("groupModal");
+    const addButton = document.querySelector('[data-bs-target="#addAreaModal"]');
 
-    if (groupModal) {
+    if (addButton) {
 
-        groupModal.addEventListener("shown.bs.modal", () => {
+        addButton.addEventListener("click", function () {
 
-            const input = groupModal.querySelector("input[name='group_name']");
+            document.getElementById("modalTitle").innerText =
+                "New Cleaning Area";
 
-            if (input) {
-                input.focus();
-                input.select();
-            }
+            document.getElementById("saveButton").innerText =
+                "Save Area";
+
+            document.getElementById("areaForm").action =
+                "/areas/add";
+
+            document.getElementById("areaForm").reset();
+
+            document.getElementById("color").value =
+                "#0d6efd";
+
+            document.getElementById("active").checked = true;
 
         });
 
     }
 
 
-    // ===========================
-    // Auto Hide Alerts
-    // ===========================
+    // ==========================
+    // EDIT AREA
+    // ==========================
 
-    const alerts = document.querySelectorAll(".alert");
+    document.querySelectorAll(".btn-edit").forEach(btn => {
 
-    alerts.forEach(alert => {
+        btn.addEventListener("click", function () {
 
-        setTimeout(() => {
+            document.getElementById("modalTitle").innerText =
+                "Edit Cleaning Area";
 
-            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-            bsAlert.close();
+            document.getElementById("saveButton").innerText =
+                "Update Area";
 
-        }, 3000);
+            document.getElementById("areaForm").action =
+                "/areas/edit/" + this.dataset.id;
+
+            document.getElementById("area_code").value =
+                this.dataset.code;
+
+            document.getElementById("area_name").value =
+                this.dataset.name;
+
+            document.getElementById("category").value =
+                this.dataset.category;
+
+            document.getElementById("estimated_minutes").value =
+                this.dataset.minutes;
+
+            document.getElementById("display_order").value =
+                this.dataset.order;
+
+            document.getElementById("color").value =
+                this.dataset.color;
+
+            document.getElementById("remarks").value =
+                this.dataset.remarks;
+
+            document.getElementById("active").checked =
+                (this.dataset.active === "True");
+
+        });
 
     });
 

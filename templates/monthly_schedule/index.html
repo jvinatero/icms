@@ -1,0 +1,258 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-lg-4">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+                    Generate Monthly Schedule
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% include "includes/flash_messages.html" %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for('monthly_schedule.generate') }}">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Year
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="year">
+
+                            {% for y in range(2025,2041) %}
+
+                            <option
+                                value="{{ y }}"
+                                {% if y==2026 %}selected{% endif %}>
+
+                                {{ y }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Month
+
+                        </label>
+
+                        <select
+                            class="form-select"
+                            name="month">
+
+                            {% set months=[
+                            "January","February","March","April",
+                            "May","June","July","August",
+                            "September","October","November","December"
+                            ] %}
+
+                            {% for m in range(1,13) %}
+
+                            <option
+                                value="{{ m }}"
+                                {% if m==7 %}selected{% endif %}>
+
+                                {{ months[m-1] }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        class="btn btn-success w-100">
+
+                        <i class="bi bi-calendar-plus"></i>
+
+                        Generate Schedule
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    Generated Schedules
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-primary">
+
+                        <tr>
+
+                            <th width="70">ID</th>
+
+                            <th>Month</th>
+
+                            <th width="180">Generated</th>
+
+                            <th width="240">Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for schedule in schedules %}
+
+                        <tr>
+
+                            <td>
+
+                                {{ schedule.id }}
+
+                            </td>
+
+                            <td>
+
+                                {{ "%02d"|format(schedule.month) }}/{{ schedule.year }}
+
+                            </td>
+
+                            <td>
+
+                                {{ schedule.generated_on.strftime("%Y-%m-%d %H:%M") }}
+
+                            </td>
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for('monthly_schedule.preview', id=schedule.id) }}"
+                                    class="btn btn-primary btn-sm"
+                                    title="View">
+
+                                    <i class="bi bi-eye"></i>
+
+                                </a>
+
+                                <a
+                                    href="{{ url_for('monthly_schedule.preview', id=schedule.id) }}"
+                                    target="_blank"
+                                    class="btn btn-success btn-sm"
+                                    title="Print">
+
+                                    <i class="bi bi-printer"></i>
+
+                                </a>
+
+                                <a
+                                    href="{{ url_for('monthly_schedule.delete', id=schedule.id) }}"
+                                    class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Delete this schedule?')"
+                                    title="Delete">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </a>
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('monthly_schedule.generate') }}"
+                                    class="d-inline">
+
+                                    <input
+                                        type="hidden"
+                                        name="year"
+                                        value="{{ schedule.year }}">
+
+                                    <input
+                                        type="hidden"
+                                        name="month"
+                                        value="{{ schedule.month }}">
+
+                                    <input
+                                        type="hidden"
+                                        name="force"
+                                        value="1">
+
+                                    <button
+                                        class="btn btn-warning btn-sm"
+                                        onclick="return confirm('Regenerate this month?')"
+                                        title="Regenerate">
+
+                                        <i class="bi bi-arrow-repeat"></i>
+
+                                    </button>
+
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="text-center text-muted">
+
+                                No schedules generated.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

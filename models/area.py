@@ -11,7 +11,7 @@ class Area(db.Model):
     )
 
     area_code = db.Column(
-        db.String(10),
+        db.String(20),
         unique=True,
         nullable=False
     )
@@ -22,26 +22,27 @@ class Area(db.Model):
     )
 
     category = db.Column(
-        db.String(30),
-        nullable=False
+        db.String(50)
     )
 
     estimated_minutes = db.Column(
         db.Integer,
-        nullable=False,
-        default=30
+        default=0
     )
 
     display_order = db.Column(
         db.Integer,
-        nullable=False,
         default=1
     )
 
-    color = db.Column(
+    map_color = db.Column(
         db.String(20),
-        nullable=False,
-        default="#0d6efd"
+        default="#D9D9D9"
+    )
+
+    map_order = db.Column(
+        db.Integer,
+        default=1
     )
 
     active = db.Column(
@@ -49,9 +50,12 @@ class Area(db.Model):
         default=True
     )
 
-    remarks = db.Column(
-        db.Text
+    assignments = db.relationship(
+        "Assignment",
+        back_populates="area",
+        lazy=True
     )
 
     def __repr__(self):
+
         return f"<Area {self.area_name}>"

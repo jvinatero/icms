@@ -1,74 +1,115 @@
 <div class="sidebar bg-dark text-white p-3">
 
     <h4 class="mb-4">
+
         <a href="{{ url_for('dashboard.index') }}"
            class="text-white text-decoration-none">
+
             ICMS
+
         </a>
+
     </h4>
 
-    <a href="{{ url_for('dashboard.index') }}" class="menu-item">
+    <a href="{{ url_for('dashboard.index') }}"
+       class="menu-item {% if active_page == 'dashboard.index' %}active{% endif %}">
+
         <i class="bi bi-speedometer2"></i>
+
         Dashboard
+
     </a>
 
     <hr class="text-secondary">
 
     <div class="menu-title">
+
         MASTER DATA
+
     </div>
 
-    <a href="{{ url_for('groups.index') }}" class="menu-item">
+    <a href="{{ url_for('groups.index') }}"
+       class="menu-item {% if active_page.startswith('groups.') %}active{% endif %}">
+
         <i class="bi bi-people-fill"></i>
+
         Cleaning Groups
+
     </a>
 
-    <a href="#" class="menu-item">
+    <a href="{{ url_for('areas.index') }}"
+       class="menu-item {% if active_page.startswith('areas.') %}active{% endif %}">
+
         <i class="bi bi-pin-map-fill"></i>
+
         Cleaning Areas
-        <span class="badge bg-secondary float-end">Soon</span>
+
     </a>
 
     <hr class="text-secondary">
 
     <div class="menu-title">
+
         OPERATIONS
+
     </div>
 
-    <a href="#" class="menu-item">
+    <a href="{{ url_for('assignments.index') }}"
+       class="menu-item {% if active_page.startswith('assignments.') %}active{% endif %}">
+
         <i class="bi bi-diagram-3-fill"></i>
-        Assignments
-        <span class="badge bg-secondary float-end">Soon</span>
+
+        Assignment Board
+
     </a>
 
-    <a href="#" class="menu-item">
-        <i class="bi bi-calendar-event-fill"></i>
-        Schedule Generator
-        <span class="badge bg-secondary float-end">Soon</span>
+    <a href="{{ url_for('monthly_schedule.index') }}"
+       class="menu-item {% if active_page.startswith('monthly_schedule.') %}active{% endif %}">
+
+        <i class="bi bi-calendar3"></i>
+
+        Monthly Schedule
+
     </a>
 
     <hr class="text-secondary">
 
     <div class="menu-title">
+
         REPORTS
+
     </div>
 
-    <a href="#" class="menu-item">
-        <i class="bi bi-file-earmark-bar-graph-fill"></i>
-        Reports
-        <span class="badge bg-secondary float-end">Soon</span>
+    <a href="{{ url_for('reports.print_schedule') }}"
+       class="menu-item {% if active_page.startswith('reports.') %}active{% endif %}">
+
+        <i class="bi bi-printer-fill"></i>
+
+        Print Schedule
+
     </a>
 
     <hr class="text-secondary">
 
     <div class="menu-title">
+
         ADMINISTRATION
+
     </div>
 
-    <a href="#" class="menu-item">
+    <a href="#"
+       class="menu-item">
+
         <i class="bi bi-gear-fill"></i>
+
         Settings
-        <span class="badge bg-secondary float-end">Soon</span>
+
+        <span class="badge bg-secondary float-end">
+
+            Soon
+
+        </span>
+
     </a>
 
 </div>

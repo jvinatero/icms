@@ -1,0 +1,547 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<style>
+
+@page{
+    size:A4 portrait;
+    margin:0;
+}
+
+html,
+body{
+
+    width:300mm;
+    margin:0;
+    padding:0;
+    background:#eef2f6;
+
+    -webkit-print-color-adjust:exact !important;
+    print-color-adjust:exact !important;
+
+}
+
+.schedule-paper{
+
+    width:calc(210mm - 12mm) !important;
+
+    max-width:none !important;
+
+    margin:0 auto !important;
+
+    padding:6mm !important;
+
+    box-sizing:border-box !important;
+
+    box-shadow:none !important;
+
+}
+
+@media print{
+
+    html,
+    body{
+
+        width:100%;
+
+        margin:0;
+
+        padding:0;
+
+        background:white;
+
+    }
+
+    .sidebar,
+    nav,
+    footer,
+    .no-print{
+
+        display:none !important;
+
+    }
+
+    .container,
+    .container-fluid{
+
+        width:100% !important;
+
+        max-width:none !important;
+
+        margin:0 !important;
+
+        padding:0 !important;
+
+    }
+
+    .schedule-paper{
+
+        width:100% !important;
+
+        max-width:none !important;
+
+        margin:0 !important;
+
+        padding:6mm !important;
+
+        box-shadow:none !important;
+
+        page-break-inside:avoid;
+
+    }
+
+}
+
+.title{
+
+    text-align:center;
+
+    margin-bottom:14px;
+
+}
+
+.title h2{
+
+    margin:0;
+
+    font-size:22pt;
+
+    font-weight:700;
+
+}
+
+.title h4{
+
+    margin:0;
+
+    font-size:16pt;
+
+    font-weight:600;
+
+}
+
+.title h3{
+
+    margin-top:8px;
+
+    font-size:20pt;
+
+    font-weight:bold;
+
+}
+
+.info{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:12px;
+
+    font-size:10pt;
+
+}
+
+.schedule{
+
+    width:100%;
+
+    table-layout:fixed;
+
+    border-collapse:collapse;
+
+    font-size:10pt;
+
+}
+
+.schedule th,
+.schedule td{
+
+    border:1px solid #666;
+
+    padding:4px;
+
+    vertical-align:top;
+
+}
+
+.schedule th{
+
+    background:#ececec;
+
+    text-align:center;
+
+}
+
+.group-column{
+
+    width:128px;
+
+}
+
+.group-name{
+
+    text-align:center;
+
+    vertical-align:middle !important;
+
+    font-weight:bold;
+
+    font-size:12pt;
+
+}
+
+.week-header{
+
+    font-weight:bold;
+
+    font-size:11pt;
+
+}
+
+.week-date{
+
+    font-size:9pt;
+
+    line-height:1.3;
+
+}
+
+.assignment{
+
+    border-radius:8px;
+
+    border:1px solid #d7d7d7;
+
+    background:#fafafa;
+
+    padding:6px;
+
+    min-height:92px;
+
+}
+
+.area{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    margin-bottom:8px;
+
+    font-weight:bold;
+
+}
+
+.area-color{
+
+    width:16px;
+
+    height:16px;
+
+    border-radius:4px;
+
+    border:1px solid rgba(0,0,0,.30);
+
+    flex:none;
+
+}
+
+.check-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:5px;
+
+    color:#666;
+
+    font-size:10px;
+
+}
+
+.chk{
+
+    cursor:pointer;
+
+    font-size:20px;
+
+    color:#222;
+
+    user-select:none;
+
+    transition:.2s;
+
+}
+
+.chk:hover{
+
+    color:#198754;
+
+    transform:scale(1.15);
+
+}
+
+</style>
+
+<div class="no-print mb-3">
+
+<a
+href="{{ url_for('monthly_schedule.index') }}"
+class="btn btn-secondary">
+
+← Back
+
+</a>
+
+<a
+    href="{{ url_for('monthly_schedule.print_schedule', id=schedule.id) }}"
+    target="_blank"
+    class="btn btn-success">
+
+    🖨 Print
+
+</a>
+
+</div>
+
+<div class="schedule-paper">
+
+<div class="title">
+
+<h2>INDAHAG CONGREGATION</h2>
+
+<h4>MONTHLY CLEANING SCHEDULE</h4>
+
+<h3>{{ month_name }} {{ schedule.year }}</h3>
+
+</div>
+
+<div class="info">
+
+<div>
+
+Generated:
+{{ schedule.generated_on.strftime("%B %d, %Y %I:%M %p") }}
+
+</div>
+
+<div>
+
+Groups: {{ matrix|length }}
+
+&nbsp;&nbsp;
+
+Weeks: {{ week_headers|length }}
+
+</div>
+
+</div>
+
+<table class="schedule">
+
+<thead>
+
+<tr>
+
+<th class="group-column">
+
+Cleaning Group
+
+</th>
+
+{% for week,header in week_headers.items() %}
+
+<th>
+
+<div class="week-header">
+
+Week {{ week }}
+
+</div>
+
+<div class="week-date">
+
+<strong>Fri</strong>
+
+{{ header.friday.strftime("%b %d") }}
+
+</div>
+
+<div class="week-date">
+
+<strong>Sun</strong>
+
+{{ header.sunday.strftime("%b %d") }}
+
+</div>
+
+</th>
+
+{% endfor %}
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for item in matrix.values() %}
+
+<tr>
+
+<td class="group-name">
+
+{{ item.group.group_name }}
+
+</td>
+
+{% for week in week_headers.keys() %}
+
+{% set detail=item.weeks.get(week) %}
+
+<td>
+
+{% if detail %}
+
+<div class="assignment">
+
+<div class="area">
+
+<div
+class="area-color"
+style="background:{{ detail.area.map_color or '#D9D9D9' }};">
+</div>
+
+<div>
+
+{{ detail.area.area_name }}
+
+</div>
+
+</div>
+<div class="check-row">
+
+<span>
+
+Fri
+
+</span>
+
+<span
+class="chk"
+data-id="{{ detail.id }}"
+data-type="Friday">
+
+{{ "☑" if detail.friday_done else "☐" }}
+
+</span>
+
+</div>
+
+<div class="check-row">
+
+<span>
+
+Sun
+
+</span>
+
+<span
+class="chk"
+data-id="{{ detail.id }}"
+data-type="Sunday">
+
+{{ "☑" if detail.sunday_done else "☐" }}
+
+</span>
+
+</div>
+
+</div>
+
+{% endif %}
+
+</td>
+
+{% endfor %}
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+document.querySelectorAll(".chk").forEach(box=>{
+
+    box.addEventListener("click",async()=>{
+
+        const response=await fetch(
+
+            "{{ url_for('monthly_schedule.toggle') }}",
+
+            {
+
+                method:"POST",
+
+                headers:{
+
+                    "Content-Type":"application/json"
+
+                },
+
+                body:JSON.stringify({
+
+                    detail_id:box.dataset.id,
+
+                    meeting_type:box.dataset.type
+
+                })
+
+            }
+
+        );
+
+        if(!response.ok){
+
+            alert("Unable to update schedule.");
+
+            return;
+
+        }
+
+        const result=await response.json();
+
+        box.textContent=result.completed ? "☑" : "☐";
+
+    });
+
+});
+
+window.addEventListener("beforeprint",()=>{
+
+    document.body.style.background="white";
+
+});
+
+window.addEventListener("afterprint",()=>{
+
+    document.body.style.background="#eef2f6";
+
+});
+
+</script>
+
+{% endblock %}

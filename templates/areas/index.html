@@ -1,0 +1,483 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-4">
+
+                <h4 class="mb-0">
+                    Cleaning Areas
+                </h4>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <form method="GET">
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        name="search"
+                        placeholder="Search area..."
+                        value="{{ search }}">
+
+                </form>
+
+            </div>
+
+            <div class="col-md-4 text-end">
+
+                <button
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addAreaModal">
+
+                    <i class="bi bi-plus-circle"></i>
+                    New Area
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        {% include "includes/flash_messages.html" %}
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-primary">
+
+                <tr>
+
+                    <th width="70">ID</th>
+
+                    <th width="100">Code</th>
+
+                    <th>Area Name</th>
+
+                    <th width="140">Category</th>
+
+                    <th width="100">Minutes</th>
+
+                    <th width="90">Order</th>
+
+                    <th width="90">Color</th>
+
+                    <th width="90">Status</th>
+
+                    <th width="130">Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for area in areas %}
+
+                <tr>
+
+                    <td>{{ area.id }}</td>
+
+                    <td>{{ area.area_code }}</td>
+
+                    <td>{{ area.area_name }}</td>
+
+                    <td>{{ area.category }}</td>
+
+                    <td>{{ area.estimated_minutes }}</td>
+
+                    <td>{{ area.display_order }}</td>
+
+                    <td class="text-center">
+
+                        <span
+                            style="
+                                display:inline-block;
+                                width:24px;
+                                height:24px;
+                                border-radius:50%;
+                                background:{{ area.map_color }};
+                                border:1px solid #999;">
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        {% if area.active %}
+
+                            <span class="badge bg-success">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bg-secondary">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="btn btn-warning btn-sm btn-edit"
+
+                            data-id="{{ area.id }}"
+                            data-code="{{ area.area_code }}"
+                            data-name="{{ area.area_name }}"
+                            data-category="{{ area.category }}"
+                            data-minutes="{{ area.estimated_minutes }}"
+                            data-order="{{ area.display_order }}"
+                            data-map-color="{{ area.map_color }}"
+                            data-active="{{ area.active }}"
+
+                            data-bs-toggle="modal"
+                            data-bs-target="#addAreaModal">
+
+                            <i class="bi bi-pencil"></i>
+
+                        </button>
+
+                        <a
+                            href="{{ url_for('areas.delete', id=area.id) }}"
+                            class="btn btn-danger btn-sm btn-delete">
+
+                            <i class="bi bi-trash"></i>
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="9" class="text-center text-muted">
+
+                        No areas found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div
+    class="modal fade"
+    id="addAreaModal"
+    tabindex="-1">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <form
+                id="areaForm"
+                method="POST"
+                action="{{ url_for('areas.add') }}">
+
+                <div class="modal-header">
+
+                    <h5
+                        class="modal-title"
+                        id="modalTitle">
+
+                        New Cleaning Area
+
+                    </h5>
+
+                    <button
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        type="button">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <div class="col-md-3">
+
+                            <label class="form-label">
+
+                                Area Code
+
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="area_code"
+                                name="area_code"
+                                required>
+
+                        </div>
+
+                        <div class="col-md-9">
+
+                            <label class="form-label">
+
+                                Area Name
+
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="area_name"
+                                name="area_name"
+                                required>
+
+                        </div>
+
+                    </div>
+                    <div class="row mt-3">
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+
+                                Category
+
+                            </label>
+
+                            <select
+                                class="form-select"
+                                id="category"
+                                name="category">
+
+                                <option>Auditorium</option>
+                                <option>Platform</option>
+                                <option>Restroom</option>
+                                <option>Exterior</option>
+                                <option>Utility</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <label class="form-label">
+
+                                Minutes
+
+                            </label>
+
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="estimated_minutes"
+                                name="estimated_minutes"
+                                value="15">
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <label class="form-label">
+
+                                Order
+
+                            </label>
+
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="display_order"
+                                name="display_order"
+                                value="1">
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <label class="form-label">
+
+                                Map Color
+
+                            </label>
+
+                            <input
+                                type="color"
+                                class="form-control form-control-color"
+                                id="map_color"
+                                name="map_color"
+                                value="#D9D9D9"
+                                title="Choose map color">
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <label class="form-label">
+
+                                Status
+
+                            </label>
+
+                            <div class="form-check mt-2">
+
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="active"
+                                    name="active"
+                                    checked>
+
+                                <label
+                                    class="form-check-label"
+                                    for="active">
+
+                                    Active
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        class="btn btn-secondary"
+                        type="button"
+                        data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+                    <button
+                        class="btn btn-primary"
+                        id="saveButton"
+                        type="submit">
+
+                        Save Area
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const modal=document.getElementById("addAreaModal");
+
+modal.addEventListener(
+    "show.bs.modal",
+    function(event){
+
+        const button=event.relatedTarget;
+
+        if(!button.classList.contains("btn-edit")){
+
+            document.getElementById("modalTitle").innerText="New Cleaning Area";
+
+            document.getElementById("saveButton").innerText="Save Area";
+
+            document.getElementById("areaForm").action="{{ url_for('areas.add') }}";
+
+            document.getElementById("area_code").value="";
+
+            document.getElementById("area_name").value="";
+
+            document.getElementById("category").value="Auditorium";
+
+            document.getElementById("estimated_minutes").value=15;
+
+            document.getElementById("display_order").value=1;
+
+            document.getElementById("map_color").value="#D9D9D9";
+
+            document.getElementById("active").checked=true;
+
+            return;
+        }
+        document.getElementById("modalTitle").innerText="Edit Cleaning Area";
+
+        document.getElementById("saveButton").innerText="Update Area";
+
+        document.getElementById("areaForm").action=
+            "/areas/edit/"+button.dataset.id;
+
+        document.getElementById("area_code").value=
+            button.dataset.code;
+
+        document.getElementById("area_name").value=
+            button.dataset.name;
+
+        document.getElementById("category").value=
+            button.dataset.category;
+
+        document.getElementById("estimated_minutes").value=
+            button.dataset.minutes;
+
+        document.getElementById("display_order").value=
+            button.dataset.order;
+
+        document.getElementById("map_color").value=
+            button.dataset.mapColor || "#D9D9D9";
+
+        document.getElementById("active").checked=
+            button.dataset.active==="True" ||
+            button.dataset.active==="true" ||
+            button.dataset.active==="1";
+
+    }
+);
+
+document.querySelectorAll(".btn-delete").forEach(btn=>{
+
+    btn.addEventListener("click",function(e){
+
+        if(!confirm("Delete this cleaning area?")){
+
+            e.preventDefault();
+
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

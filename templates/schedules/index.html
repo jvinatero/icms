@@ -1,0 +1,200 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+<div class="row">
+
+    <div class="col-lg-4">
+
+        <div class="card shadow-sm mb-3">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    Generate Schedule
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST"
+                      action="{{ url_for('schedules.generate') }}">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Schedule Date
+
+                        </label>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            name="schedule_date"
+                            required>
+
+                    </div>
+
+                    <button
+                        class="btn btn-success w-100">
+
+                        <i class="bi bi-calendar-plus"></i>
+
+                        Generate Schedule
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+
+                <h5 class="mb-0">
+
+                    Schedule History
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% include "includes/flash_messages.html" %}
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-primary">
+
+                        <tr>
+
+                            <th width="70">
+
+                                ID
+
+                            </th>
+
+                            <th>
+
+                                Schedule Date
+
+                            </th>
+
+                            <th width="120">
+
+                                Status
+
+                            </th>
+
+                            <th width="160">
+
+                                Action
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for schedule in schedules %}
+
+                        <tr>
+
+                            <td>
+
+                                {{ schedule.id }}
+
+                            </td>
+
+                            <td>
+
+                                {{ schedule.schedule_date.strftime("%B %d, %Y") }}
+
+                            </td>
+
+                            <td>
+
+                                {% if schedule.completed %}
+
+                                    <span class="badge bg-success">
+
+                                        Completed
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-warning text-dark">
+
+                                        Pending
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                <button
+                                    class="btn btn-primary btn-sm"
+                                    disabled>
+
+                                    <i class="bi bi-eye"></i>
+
+                                </button>
+
+                                <button
+                                    class="btn btn-secondary btn-sm"
+                                    disabled>
+
+                                    <i class="bi bi-printer"></i>
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td colspan="4"
+                                class="text-center text-muted">
+
+                                No schedules generated.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
